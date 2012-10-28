@@ -66,7 +66,7 @@ do ($, _, Backbone) ->
       selector
 
     delegateEvents: (events) ->
-      return unless (events or= _.result this, "events")
+      return super unless (events or= _.result this, "events")
       finalEvents = {}
       for selector, handerName of events
         newSelector = @_parseSymbolSelector selector
