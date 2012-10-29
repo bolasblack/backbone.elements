@@ -10,10 +10,7 @@ do ($, _, Backbone) ->
 
   View = Backbone.View
   class Backbone.View extends View
-    elements: false
     elementsPrefix: "$"
-    _reverseElements: false
-    _regPrefix: false
 
     _configure: (options) ->
       super
@@ -24,29 +21,27 @@ do ($, _, Backbone) ->
       return unless @elements
       @_refreshVarible()
 
-      cache = {}
       for selector, varName of @elements
+        selector = @_parseSymbolSelector selector
         do (selector, varName) =>
-          debugger if !!~_(selector).indexOf "$child"
-          selector = @_parseSymbolSelector selector
           this[@elementsPrefix + varName] = (subSelector, refresh) =>
             if subSelector in [true, false]
               [subSelector, refresh] = [undefined, subSelector]
-            $elem = if refresh then @$(selector) else cache[varName] or @$ selector
+            $elem = if refresh
+              @$ selector
+            else
+              @_elementsCache[varName] or @$ selector
             return $elem unless $elem.length
-            cache[varName] = $elem
+            @_elementsCache[varName] = $elem
             return $elem unless subSelector
             $elem.find subSelector
 
-      @refreshElements = ->
-        @undelegateEvents()
-        cache = {}
-        for selector, varName of @elements
-          delete this[@elementsPrefix + varName]
-        @_refreshVarible()
-        @initElements()
-
     refreshElements: ->
+      @undelegateEvents()
+      for selector, varName of @elements
+        delete this[@elementsPrefix + varName]
+      @_refreshVarible()
+      @initElements()
 
     $: (selector) ->
       super @_parseSymbolSelector selector
@@ -54,6 +49,7 @@ do ($, _, Backbone) ->
     _refreshVarible: ->
       @_reverseElements = _.object ([v, k] for k, v of @elements)
       @_regPrefix = reEscape @elementsPrefix
+      @_elementsCache = {}
 
     _parseSymbol: (elementSymbol) ->
       elementNameRE = ///#{@_regPrefix}([^\s#{@_regPrefix}]*)///
