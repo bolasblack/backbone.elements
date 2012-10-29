@@ -66,7 +66,7 @@ describe "the backbone elements plugin", ->
     it "should not cache when element not exist", ->
       @theView.$emptyElement().should.not.equal @theView.$emptyElement()
 
-  describe "the refresh method", ->
+  describe "the refreshElements method", ->
     it "should be work", ->
       @theView.refreshElements()
       @$child.should.not.equal @theView.$child()
@@ -78,6 +78,12 @@ describe "the backbone elements plugin", ->
 
     it "should refresh events bind when refresh elements cache", ->
       @theView.elements = ".test-empty-element": "child"
-      @theView.initElements()
+      @theView.refreshElements()
       @theView.$child().trigger "click"
       @clickChildSpy.called.should.be.false
+
+  describe "the clearElements method", ->
+    it "should be work", ->
+      @theView.clearElements()
+      for property in ["_reverseElements", "_elementsCache", "_regPrefix"]
+        @theView.should.not.have.property property

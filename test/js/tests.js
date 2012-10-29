@@ -85,7 +85,7 @@
         return this.theView.$emptyElement().should.not.equal(this.theView.$emptyElement());
       });
     });
-    return describe("the refresh method", function() {
+    describe("the refreshElements method", function() {
       it("should be work", function() {
         this.theView.refreshElements();
         return this.$child.should.not.equal(this.theView.$child());
@@ -99,9 +99,22 @@
         this.theView.elements = {
           ".test-empty-element": "child"
         };
-        this.theView.initElements();
+        this.theView.refreshElements();
         this.theView.$child().trigger("click");
         return this.clickChildSpy.called.should.be["false"];
+      });
+    });
+    return describe("the clearElements method", function() {
+      return it("should be work", function() {
+        var property, _i, _len, _ref, _results;
+        this.theView.clearElements();
+        _ref = ["_reverseElements", "_elementsCache", "_regPrefix"];
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          property = _ref[_i];
+          _results.push(this.theView.should.not.have.property(property));
+        }
+        return _results;
       });
     });
   });

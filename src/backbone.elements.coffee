@@ -12,18 +12,32 @@ do ($, _, Backbone) ->
   class Backbone.View extends View
     elementsPrefix: "$"
 
+    $: (selector) ->
+      super @_parseSymbolSelector selector
+
+    refreshElements: ->
+      @undelegateEvents()
+      for selector, varName of @elements
+        delete this[@elementsPrefix + varName]
+      @_refreshVarible()
+      @_initElements()
+
+    clearElements: ->
+      for property in ["_reverseElements", "_elementsCache", "_regPrefix"]
+        delete this[property]
+
     _configure: (options) ->
       super
       _.extend this, _.pick options, ["elements", "elementsPrefix"]
-      @initElements()
+      @_initElements()
 
-    initElements: ->
+    _initElements: ->
       return unless @elements
       @_refreshVarible()
 
       for selector, varName of @elements
-        selector = @_parseSymbolSelector selector
         do (selector, varName) =>
+          selector = @_parseSymbolSelector selector
           this[@elementsPrefix + varName] = (subSelector, refresh) =>
             if subSelector in [true, false]
               [subSelector, refresh] = [undefined, subSelector]
@@ -35,16 +49,6 @@ do ($, _, Backbone) ->
             @_elementsCache[varName] = $elem
             return $elem unless subSelector
             $elem.find subSelector
-
-    refreshElements: ->
-      @undelegateEvents()
-      for selector, varName of @elements
-        delete this[@elementsPrefix + varName]
-      @_refreshVarible()
-      @initElements()
-
-    $: (selector) ->
-      super @_parseSymbolSelector selector
 
     _refreshVarible: ->
       @_reverseElements = _.object ([v, k] for k, v of @elements)
