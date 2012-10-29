@@ -8,6 +8,7 @@ describe "the backbone elements plugin", ->
       el: $ "#test"
       elements:
         ".test-child": "child"
+        "$child .test-child-element": "childElement"
         ".test-empty-element": "emptyElement"
       events:
         "click $child": @clickChildSpy
@@ -37,6 +38,9 @@ describe "the backbone elements plugin", ->
       @theView.$child(".test-child-element")[0].should.equal @theView.$(".test-child .test-child-element")[0]
 
   describe "the select symbol", ->
+    it "should work in elements selector", ->
+      @theView.$childElement()[0].should.equal @theView.$child(".test-child-element")[0]
+
     it "should work in events selector", ->
       @$child.trigger "click"
       @clickChildSpy.called.should.be.true

@@ -11,6 +11,7 @@
         el: $("#test"),
         elements: {
           ".test-child": "child",
+          "$child .test-child-element": "childElement",
           ".test-empty-element": "emptyElement"
         },
         events: {
@@ -51,6 +52,9 @@
       });
     });
     describe("the select symbol", function() {
+      it("should work in elements selector", function() {
+        return this.theView.$childElement()[0].should.equal(this.theView.$child(".test-child-element")[0]);
+      });
       it("should work in events selector", function() {
         this.$child.trigger("click");
         return this.clickChildSpy.called.should.be["true"];
