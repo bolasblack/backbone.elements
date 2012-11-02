@@ -41,6 +41,15 @@ describe "the backbone elements plugin", ->
     it "should work in elements selector", ->
       @theView.$childElement()[0].should.equal @theView.$child(".test-child-element")[0]
 
+    it "should be parsed in all select case", ->
+      specialCases = ["#aaa", ".aaa", ",aaa", " aaa", ">aaa", "+aaa", "~aaa", "[attr='aaa']", ":after"]
+      unableCase = specialCases.join ""
+
+      for specialCase in specialCases
+        @theView._parseSymbolSelector("$child#{specialCase}").should.equal ".test-child#{specialCase}"
+      @theView._parseSymbolSelector("$child#{unableCase}").should.equal ".test-child#{unableCase}"
+      @theView._parseSymbolSelector(specialCases.join "$child").should.equal specialCases.join ".test-child"
+
     it "should work in events selector", ->
       @$child.trigger "click"
       @clickChildSpy.called.should.be.true

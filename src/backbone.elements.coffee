@@ -1,16 +1,29 @@
 do ($, _, Backbone) ->
-  reEscape = (str) ->
-    str.replace(/\\/g, "\\\\")
-      .replace(/\//g, "\\/").replace(/\,/g, "\\,").replace(/\./g, "\\.")
-      .replace(/\^/g, "\\^").replace(/\$/g, "\\$").replace(/\|/g, "\\|")
-      .replace(/\?/g, "\\?").replace(/\+/g, "\\+").replace(/\*/g, "\\*")
-      .replace(/\[/g, "\\[").replace(/\]/g, "\\]")
-      .replace(/\{/g, "\\{").replace(/\}/g, "\\}")
-      .replace(/\(/g, "\\(").replace(/\)/g, "\\)")
+  reEscape = (str, skipChar=[]) ->
+    reSpecialChar = [
+      "\\", "/", ",", "."
+      "|", "^", "$", "?"
+      "+", "*", "[", "]"
+      "{", "}", "(", ")"
+    ]
+    for char in reSpecialChar when char not in skipChar
+      re = RegExp "\\" + char, "g"
+      str = str.replace re, "\\#{char}"
+    str
 
   View = Backbone.View
   class Backbone.View extends View
     elementsPrefix: "$"
+    _elementsSymbolSpliter: [
+      # normal selector
+      "\\#", "\\."
+      # combo selector
+      "\\,", "\\s", "\\>", "\\+", "\\~"
+      # attribute selector
+      "\\["
+      # special selector
+      "\\:"
+    ]
 
     $: (selector) ->
       super @_parseSymbolSelector selector
@@ -55,13 +68,17 @@ do ($, _, Backbone) ->
       @_regPrefix = reEscape @elementsPrefix
       @_elementsCache = {}
 
+    _negativeReStr: ->
+      (@_elementsSymbolSpliter.join "") + @_regPrefix
+
     _parseSymbol: (elementSymbol) ->
-      elementNameRE = ///#{@_regPrefix}([^\s#{@_regPrefix}]*)///
+      elementNameRE = ///#{@_regPrefix}([^#{@_negativeReStr()}]*)///
       elementName = elementSymbol.match(elementNameRE)[1]
       @_reverseElements[elementName] or elementSymbol
 
     _parseSymbolSelector: (selector) ->
-      elementsSelectorRE = ///#{@_regPrefix}([^\s#{@_regPrefix}]*)(\s|$)///g
+      endReStr = @_elementsSymbolSpliter.join "|"
+      elementsSelectorRE = ///#{@_regPrefix}([^#{@_negativeReStr()}]*)(?=#{endReStr}|$)///g
       while matchs = selector.match elementsSelectorRE
         elementSymbol = $.trim matchs[0]
         eventSelector = @_parseSymbol elementSymbol

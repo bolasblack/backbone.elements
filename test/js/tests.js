@@ -55,6 +55,17 @@
       it("should work in elements selector", function() {
         return this.theView.$childElement()[0].should.equal(this.theView.$child(".test-child-element")[0]);
       });
+      it("should be parsed in all select case", function() {
+        var specialCase, specialCases, unableCase, _i, _len;
+        specialCases = ["#aaa", ".aaa", ",aaa", " aaa", ">aaa", "+aaa", "~aaa", "[attr='aaa']", ":after"];
+        unableCase = specialCases.join("");
+        for (_i = 0, _len = specialCases.length; _i < _len; _i++) {
+          specialCase = specialCases[_i];
+          this.theView._parseSymbolSelector("$child" + specialCase).should.equal(".test-child" + specialCase);
+        }
+        this.theView._parseSymbolSelector("$child" + unableCase).should.equal(".test-child" + unableCase);
+        return this.theView._parseSymbolSelector(specialCases.join("$child")).should.equal(specialCases.join(".test-child"));
+      });
       it("should work in events selector", function() {
         this.$child.trigger("click");
         return this.clickChildSpy.called.should.be["true"];
