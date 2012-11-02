@@ -86,10 +86,13 @@ describe "the backbone elements plugin", ->
       @theView.$child(true).should.equal @theView.$child()
 
     it "should refresh events bind when refresh elements cache", ->
-      @theView.elements = ".test-empty-element": "child"
+      $oldChild = @theView.$child()
+      @theView.elements = ".other-element": "child"
       @theView.refreshElements()
-      @theView.$child().trigger "click"
+      $oldChild.trigger "click"
       @clickChildSpy.called.should.be.false
+      @theView.$child().trigger "click"
+      @clickChildSpy.called.should.be.true
 
   describe "the clearElements method", ->
     it "should be work", ->

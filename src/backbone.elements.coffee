@@ -32,8 +32,8 @@ do ($, _, Backbone) ->
       @undelegateEvents()
       for selector, varName of @elements
         delete this[@elementsPrefix + varName]
-      @_refreshVarible()
       @_initElements()
+      @delegateEvents()
 
     clearElements: ->
       for property in ["_reverseElements", "_elementsCache", "_regPrefix"]

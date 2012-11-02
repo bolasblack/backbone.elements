@@ -107,12 +107,16 @@
         return this.theView.$child(true).should.equal(this.theView.$child());
       });
       return it("should refresh events bind when refresh elements cache", function() {
+        var $oldChild;
+        $oldChild = this.theView.$child();
         this.theView.elements = {
-          ".test-empty-element": "child"
+          ".other-element": "child"
         };
         this.theView.refreshElements();
+        $oldChild.trigger("click");
+        this.clickChildSpy.called.should.be["false"];
         this.theView.$child().trigger("click");
-        return this.clickChildSpy.called.should.be["false"];
+        return this.clickChildSpy.called.should.be["true"];
       });
     });
     return describe("the clearElements method", function() {
