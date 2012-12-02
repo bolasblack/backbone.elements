@@ -16,7 +16,6 @@ do (jQuery, _, Backbone, console) ->
 
   {$: original$, _configure, delegateEvents} = Backbone.View.prototype
   _.extend Backbone.View.prototype,
-    elementsPrefix: "$"
     _elementsSymbolSpliter: [
       # normal selector
       "\\#", "\\."
@@ -27,6 +26,8 @@ do (jQuery, _, Backbone, console) ->
       # special selector
       "\\:"
     ]
+
+    elementsPrefix: "$"
 
     $: (selector) ->
       original$.call this, @parseSelectorSymbol selector
@@ -68,6 +69,21 @@ do (jQuery, _, Backbone, console) ->
       _.extend this, _.pick options, ["elements", "elementsPrefix"]
       @_initElements()
 
+      if _.isFunction @dispose
+        dispose = @dispose
+        @dispose = ->
+          dispose.apply this, arguments
+          @clearElements()
+
+    delegateEvents: (events) ->
+      unless (events or= _.result this, "events")
+        return delegateEvents.apply this, arguments
+      finalEvents = {}
+      for selector, handerName of events
+        newSelector = @parseSelectorSymbol selector
+        finalEvents[newSelector] = handerName
+      delegateEvents.call this, finalEvents
+
     _parseSymbol: (elementSymbol) ->
       elementNameRE = ///#{@_regPrefix}([^#{@_negativeReStr()}]*)///
       elementName = elementSymbol.match(elementNameRE)[1]
@@ -99,12 +115,3 @@ do (jQuery, _, Backbone, console) ->
 
     _negativeReStr: ->
       (@_elementsSymbolSpliter.join "") + @_regPrefix
-
-    delegateEvents: (events) ->
-      unless (events or= _.result this, "events")
-        return delegateEvents.apply this, arguments
-      finalEvents = {}
-      for selector, handerName of events
-        newSelector = @parseSelectorSymbol selector
-        finalEvents[newSelector] = handerName
-      delegateEvents.call this, finalEvents

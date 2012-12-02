@@ -4,6 +4,7 @@ describe "the backbone elements plugin", ->
 
   beforeEach ->
     @clickChildSpy = sinon.spy()
+    @disposeSpy = sinon.spy()
     @theView = new (View.extend
       el: $ "#test"
       elements:
@@ -15,6 +16,7 @@ describe "the backbone elements plugin", ->
         "click $child": @clickChildSpy
     )
     @$child = @theView.$child()
+    @theView.dispose = @disposeSpy
 
   describe "the elements attribute", ->
     it "should be work", ->
@@ -110,3 +112,7 @@ describe "the backbone elements plugin", ->
       @theView.clearElements()
       for property in ["_reverseElements", "_elementsCache", "_regPrefix"]
         @theView.should.not.have.property property
+
+    it "should run when disposed", ->
+      @theView.dispose()
+      @disposeSpy.called.should.be.true

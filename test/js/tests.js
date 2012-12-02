@@ -7,6 +7,7 @@
     View = Backbone.View;
     beforeEach(function() {
       this.clickChildSpy = sinon.spy();
+      this.disposeSpy = sinon.spy();
       this.theView = new (View.extend({
         el: $("#test"),
         elements: {
@@ -19,7 +20,8 @@
           "click $child": this.clickChildSpy
         }
       }));
-      return this.$child = this.theView.$child();
+      this.$child = this.theView.$child();
+      return this.theView.dispose = this.disposeSpy;
     });
     describe("the elements attribute", function() {
       it("should be work", function() {
@@ -121,7 +123,7 @@
       });
     });
     return describe("the clearElements method", function() {
-      return it("should be work", function() {
+      it("should be work", function() {
         var property, _i, _len, _ref, _results;
         this.theView.clearElements();
         _ref = ["_reverseElements", "_elementsCache", "_regPrefix"];
@@ -131,6 +133,10 @@
           _results.push(this.theView.should.not.have.property(property));
         }
         return _results;
+      });
+      return it("should run when disposed", function() {
+        this.theView.dispose();
+        return this.disposeSpy.called.should.be["true"];
       });
     });
   });
