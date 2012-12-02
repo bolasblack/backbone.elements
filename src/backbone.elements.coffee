@@ -1,4 +1,4 @@
-do ($, _, Backbone) ->
+do (jQuery, _, Backbone) ->
   reEscape = (str, skipChar=[]) ->
     reSpecialChar = [
       "\\", "/", ",", "."
@@ -11,8 +11,8 @@ do ($, _, Backbone) ->
       str = str.replace re, "\\#{char}"
     str
 
-  View = Backbone.View
-  class Backbone.View extends View
+  {$, _configure, delegateEvents} = Backbone.View.prototype
+  _.extend Backbone.View.prototype,
     elementsPrefix: "$"
     _elementsSymbolSpliter: [
       # normal selector
@@ -26,7 +26,7 @@ do ($, _, Backbone) ->
     ]
 
     $: (selector) ->
-      super @_parseSymbolSelector selector
+      $.call this, @_parseSymbolSelector selector
 
     refreshElements: ->
       @undelegateEvents()
@@ -40,7 +40,7 @@ do ($, _, Backbone) ->
         delete this[property]
 
     _configure: (options) ->
-      super
+      _configure.apply this, arguments
       _.extend this, _.pick options, ["elements", "elementsPrefix"]
       @_initElements()
 
@@ -80,15 +80,16 @@ do ($, _, Backbone) ->
       endReStr = @_elementsSymbolSpliter.join "|"
       elementsSelectorRE = ///#{@_regPrefix}([^#{@_negativeReStr()}]*)(?=#{endReStr}|$)///g
       while matchs = selector.match elementsSelectorRE
-        elementSymbol = $.trim matchs[0]
+        elementSymbol = jQuery.trim matchs[0]
         eventSelector = @_parseSymbol elementSymbol
         selector = selector.replace elementSymbol, eventSelector
       selector
 
     delegateEvents: (events) ->
-      return super unless (events or= _.result this, "events")
+      unless (events or= _.result this, "events")
+        return delegateEvents.apply this, arguments
       finalEvents = {}
       for selector, handerName of events
         newSelector = @_parseSymbolSelector selector
         finalEvents[newSelector] = handerName
-      super finalEvents
+      delegateEvents.call this, finalEvents
