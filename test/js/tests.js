@@ -12,7 +12,8 @@
         elements: {
           ".test-child": "child",
           "$child .test-child-element": "childElement",
-          ".test-empty-element": "emptyElement"
+          ".test-empty-element": "emptyElement",
+          "$notExistElement li": "it_may_call_stack_overflow"
         },
         events: {
           "click $child": this.clickChildSpy

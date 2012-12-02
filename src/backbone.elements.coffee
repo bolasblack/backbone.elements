@@ -1,4 +1,7 @@
-do (jQuery, _, Backbone) ->
+do (jQuery, _, Backbone, console) ->
+  nop = ->
+  console ?= {log: nop, warn: nop, error: nop}
+
   reEscape = (str, skipChar=[]) ->
     reSpecialChar = [
       "\\", "/", ",", "."
@@ -11,7 +14,7 @@ do (jQuery, _, Backbone) ->
       str = str.replace re, "\\#{char}"
     str
 
-  {$, _configure, delegateEvents} = Backbone.View.prototype
+  {$: original$, _configure, delegateEvents} = Backbone.View.prototype
   _.extend Backbone.View.prototype,
     elementsPrefix: "$"
     _elementsSymbolSpliter: [
@@ -26,7 +29,7 @@ do (jQuery, _, Backbone) ->
     ]
 
     $: (selector) ->
-      $.call this, @_parseSymbolSelector selector
+      original$.call this, @_parseSymbolSelector selector
 
     refreshElements: ->
       @undelegateEvents()
@@ -79,10 +82,22 @@ do (jQuery, _, Backbone) ->
     _parseSymbolSelector: (selector) ->
       endReStr = @_elementsSymbolSpliter.join "|"
       elementsSelectorRE = ///#{@_regPrefix}([^#{@_negativeReStr()}]*)(?=#{endReStr}|$)///g
-      while matchs = selector.match elementsSelectorRE
+      cannotParseSymbols = []
+      elementSymbol = null
+      while (do (selector, elementsSelectorRE) =>
+        matchs = selector.match(elementsSelectorRE)
+        return false unless matchs
         elementSymbol = jQuery.trim matchs[0]
-        eventSelector = @_parseSymbol elementSymbol
-        selector = selector.replace elementSymbol, eventSelector
+        return false if elementSymbol in cannotParseSymbols
+        true
+      )
+
+        parsedSelector = @_parseSymbol elementSymbol
+        if elementsSelectorRE.test parsedSelector
+          cannotParseSymbols.push elementSymbol
+          console.warn "element symbol", elementSymbol, "not exist"
+        else
+          selector = selector.replace elementSymbol, parsedSelector
       selector
 
     delegateEvents: (events) ->
