@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Backbone.elements by bolasblack</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Backbone.elements</h1>
+        <p>Add shortcut for Backbone.View selector</p>
+        <p class="view"><a href="https://github.com/bolasblack/backbone.elements">View the Project on GitHub <small>bolasblack/backbone.elements</small></a></p>
+        <ul>
+          <li><a href="https://github.com/bolasblack/backbone.elements/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/bolasblack/backbone.elements/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/bolasblack/backbone.elements">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Backbone.elements</h1>
+
+<p><strong>Add shortcut for Backbone.View selector</strong></p>
+
+<h2>Install</h2>
+
+<div class="highlight"><pre><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"../lib/jquery-1.8.2.min.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"../lib/underscore-min.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"../lib/backbone-min.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"../lib/backbone.elements.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+<h2>Usage</h2>
+
+<h3>Add a shortcut</h3>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nx">View</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+  <span class="nv">elements:</span>
+    <span class="s">".elem-selector"</span><span class="o">:</span> <span class="s">"elem"</span>
+</pre></div>
+
+<h3>Use shortcut</h3>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nx">View</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+  <span class="nv">elements:</span>
+    <span class="s">".elem-selector"</span><span class="o">:</span> <span class="s">"elem"</span>
+    <span class="s">"$elem .child-elem"</span>
+
+  <span class="c1"># use shortcut in event bind</span>
+  <span class="nv">events:</span>
+    <span class="s">"click $elem"</span><span class="o">:</span> <span class="s">"_clickHandler"</span>
+    <span class="s">"mouseover $elem"</span><span class="o">:</span> <span class="s">"_hoverHandler"</span>
+    <span class="s">"dblclick $elem"</span><span class="o">:</span> <span class="s">"_dblclickHandler"</span>
+
+  <span class="c1"># get element jquery object</span>
+  <span class="nv">_clickHandler: </span><span class="o">-&gt;</span>
+    <span class="nx">@$elem</span><span class="p">().</span><span class="nx">text</span> <span class="s">"clicked"</span>
+
+  <span class="nv">_dblclickHandler: </span><span class="o">-&gt;</span>
+    <span class="nx">@$elem</span><span class="p">().</span><span class="nx">replaceWith</span> <span class="nx">$</span> <span class="s">"&lt;div&gt;"</span><span class="p">,</span> <span class="k">class</span><span class="o">:</span> <span class="s">"loading elem-selector"</span>
+    <span class="c1"># refresh elem cache</span>
+    <span class="nx">@$elem</span><span class="p">(</span><span class="kc">true</span><span class="p">).</span><span class="nx">removeClass</span> <span class="s">"loading"</span>
+
+  <span class="c1"># select child element</span>
+  <span class="nv">_hoverHandler: </span><span class="o">-&gt;</span>
+    <span class="c1"># use as `this.$`</span>
+    <span class="nx">@$elem</span><span class="p">(</span><span class="s">".sub-elem"</span><span class="p">).</span><span class="nx">addClass</span> <span class="s">"hover"</span>
+    <span class="c1"># same as `@$elem().find(".sub-elem")`</span>
+
+    <span class="c1"># use in `this.$`, **not recommend**, becase the</span>
+    <span class="c1"># `$elem` shortcut cann't use the element cache</span>
+    <span class="nx">@$</span><span class="p">(</span><span class="s">"$elem .another-elem"</span><span class="p">).</span><span class="nx">removeClass</span> <span class="s">"hover"</span>
+    <span class="c1"># same as `@$(".elem-selector .another-elem")</span>
+</pre></div>
+
+<h3>Refresh Element Cache</h3>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nx">View</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+  <span class="nv">elements:</span>
+    <span class="s">".elem-selector"</span><span class="o">:</span> <span class="s">"elem"</span>
+
+  <span class="nv">rerender: </span><span class="o">-&gt;</span>
+    <span class="nx">@render</span><span class="p">()</span>
+    <span class="nx">@refreshCache</span><span class="p">()</span>
+</pre></div>
+
+<h3>Parse Shortcut</h3>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nx">View</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+  <span class="nv">elements:</span>
+    <span class="s">".elem-selector"</span><span class="o">:</span> <span class="s">"elem"</span>
+
+  <span class="nv">events:</span>
+    <span class="s">"click $elem"</span><span class="o">:</span> <span class="s">"_clickHandler"</span>
+
+  <span class="nv">_clickHandler: </span><span class="nf">(event) -&gt;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="kc">on</span> <span class="s">"hover"</span><span class="p">,</span> <span class="nx">@parseSelectorSymbol</span><span class="p">(</span><span class="s">"$elem .hotpoint"</span><span class="p">),</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nx">alert</span> <span class="s">"hover"</span>
+</pre></div>
+
+<h3>Dispose Element Cache</h3>
+
+<p>It will dispose element cache autonomicly when Backbone.View call <code>remove</code> method.</p>
+
+<div class="highlight"><pre>
+<span class="k">class</span> <span class="nx">View</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+  <span class="nv">elements:</span>
+    <span class="s">".elem-selector"</span><span class="o">:</span> <span class="s">"elem"</span>
+
+  <span class="nv">events:</span>
+    <span class="s">"click $elem"</span><span class="o">:</span> <span class="s">"_clickHandler"</span>
+
+  <span class="nv">_clickHandler: </span><span class="nf">(event) -&gt;</span>
+    <span class="nx">@clearElements</span><span class="p">()</span>
+</pre></div>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/bolasblack">bolasblack</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
