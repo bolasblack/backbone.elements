@@ -82,3 +82,20 @@ class View extends Backbone.View
     $(document).on "hover", @parseSelectorSymbol("$elem .hotpoint"), (event) =>
       alert "hover"
 ```
+
+### Dispose Element Cache
+
+It will dispose element cache autonomicly when Backbone.View call `remove` method.
+
+```coffeescript
+
+class View extends Backbone.View
+  elements:
+    ".elem-selector": "elem"
+  
+  events:
+    "click $elem": "_clickHandler"
+  
+  _clickHandler: (event) ->
+    @clearElements()
+```
