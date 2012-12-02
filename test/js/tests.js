@@ -62,10 +62,10 @@
         unableCase = specialCases.join("");
         for (_i = 0, _len = specialCases.length; _i < _len; _i++) {
           specialCase = specialCases[_i];
-          this.theView._parseSymbolSelector("$child" + specialCase).should.equal(".test-child" + specialCase);
+          this.theView.parseSelectorSymbol("$child" + specialCase).should.equal(".test-child" + specialCase);
         }
-        this.theView._parseSymbolSelector("$child" + unableCase).should.equal(".test-child" + unableCase);
-        return this.theView._parseSymbolSelector(specialCases.join("$child")).should.equal(specialCases.join(".test-child"));
+        this.theView.parseSelectorSymbol("$child" + unableCase).should.equal(".test-child" + unableCase);
+        return this.theView.parseSelectorSymbol(specialCases.join("$child")).should.equal(specialCases.join(".test-child"));
       });
       it("should work in events selector", function() {
         this.$child.trigger("click");

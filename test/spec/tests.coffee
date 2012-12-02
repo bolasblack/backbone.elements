@@ -52,13 +52,13 @@ describe "the backbone elements plugin", ->
       unableCase = specialCases.join ""
 
       for specialCase in specialCases
-        @theView._parseSymbolSelector("$child#{specialCase}")
+        @theView.parseSelectorSymbol("$child#{specialCase}")
           .should.equal ".test-child#{specialCase}"
 
-      @theView._parseSymbolSelector("$child#{unableCase}")
+      @theView.parseSelectorSymbol("$child#{unableCase}")
         .should.equal ".test-child#{unableCase}"
 
-      @theView._parseSymbolSelector(specialCases.join "$child")
+      @theView.parseSelectorSymbol(specialCases.join "$child")
         .should.equal specialCases.join ".test-child"
 
     it "should work in events selector", ->
