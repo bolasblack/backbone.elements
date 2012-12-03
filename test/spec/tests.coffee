@@ -45,6 +45,16 @@ describe "the backbone elements plugin", ->
     it "should work in elements selector", ->
       @theView.$childElement()[0].should.equal @theView.$child(".test-child-element")[0]
 
+    it "should work in events selector", ->
+      @$child.trigger "click"
+      @clickChildSpy.called.should.be.true
+
+    it "should work in `this.$` selector", ->
+      @theView.$("$child")[0].should.equal @theView.$(".test-child")[0]
+
+    it "should be parsed in nested case", ->
+      @theView.parseSelectorSymbol("$childElement").should.equal ".test-child .test-child-element"
+
     it "should be parsed in all select case", ->
       specialCases = [
         "#aaa", ".aaa", ",aaa"
@@ -62,13 +72,6 @@ describe "the backbone elements plugin", ->
 
       @theView.parseSelectorSymbol(specialCases.join "$child")
         .should.equal specialCases.join ".test-child"
-
-    it "should work in events selector", ->
-      @$child.trigger "click"
-      @clickChildSpy.called.should.be.true
-
-    it "should work in `this.$` selector", ->
-      @theView.$("$child")[0].should.equal @theView.$(".test-child")[0]
 
   describe "the elementsPrefix attribute", ->
     it "should could be changed", ->

@@ -57,7 +57,7 @@ do (jQuery, _, Backbone, console) ->
       )
 
         parsedSelector = @_parseSymbol elementSymbol
-        if elementsSelectorRE.test parsedSelector
+        if RegExp(reEscape elementSymbol).test parsedSelector
           cannotParseSymbols.push elementSymbol
           console.warn "element symbol", elementSymbol, "not exist"
         else
@@ -89,24 +89,24 @@ do (jQuery, _, Backbone, console) ->
       elementName = elementSymbol.match(elementNameRE)[1]
       @_reverseElements[elementName] or elementSymbol
 
+    _generateShortcut: (varName, selector) ->
+      selector = @parseSelectorSymbol selector
+      this[@elementsPrefix + varName] = (subSelector, refresh) =>
+        if subSelector in [true, false]
+          [subSelector, refresh] = [undefined, subSelector]
+        $elem = if refresh
+          @$ selector
+        else
+          @_elementsCache[varName] or @$ selector
+        return $elem unless $elem.length
+        @_elementsCache[varName] = $elem
+        return $elem unless subSelector
+        $elem.find subSelector
+
     _initElements: ->
       return unless @elements
       @_refreshVarible()
-
-      for selector, varName of @elements
-        do (selector, varName) =>
-          selector = @parseSelectorSymbol selector
-          this[@elementsPrefix + varName] = (subSelector, refresh) =>
-            if subSelector in [true, false]
-              [subSelector, refresh] = [undefined, subSelector]
-            $elem = if refresh
-              @$ selector
-            else
-              @_elementsCache[varName] or @$ selector
-            return $elem unless $elem.length
-            @_elementsCache[varName] = $elem
-            return $elem unless subSelector
-            $elem.find subSelector
+      _(@elements).forEach $.proxy @_generateShortcut, this
 
     _refreshVarible: ->
       @_reverseElements = _.object ([v, k] for k, v of @elements)

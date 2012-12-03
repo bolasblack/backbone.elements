@@ -58,7 +58,17 @@
       it("should work in elements selector", function() {
         return this.theView.$childElement()[0].should.equal(this.theView.$child(".test-child-element")[0]);
       });
-      it("should be parsed in all select case", function() {
+      it("should work in events selector", function() {
+        this.$child.trigger("click");
+        return this.clickChildSpy.called.should.be["true"];
+      });
+      it("should work in `this.$` selector", function() {
+        return this.theView.$("$child")[0].should.equal(this.theView.$(".test-child")[0]);
+      });
+      it("should be parsed in nested case", function() {
+        return this.theView.parseSelectorSymbol("$childElement").should.equal(".test-child .test-child-element");
+      });
+      return it("should be parsed in all select case", function() {
         var specialCase, specialCases, unableCase, _i, _len;
         specialCases = ["#aaa", ".aaa", ",aaa", " aaa", ">aaa", "+aaa", "~aaa", "[attr='aaa']", ":after"];
         unableCase = specialCases.join("");
@@ -68,13 +78,6 @@
         }
         this.theView.parseSelectorSymbol("$child" + unableCase).should.equal(".test-child" + unableCase);
         return this.theView.parseSelectorSymbol(specialCases.join("$child")).should.equal(specialCases.join(".test-child"));
-      });
-      it("should work in events selector", function() {
-        this.$child.trigger("click");
-        return this.clickChildSpy.called.should.be["true"];
-      });
-      return it("should work in `this.$` selector", function() {
-        return this.theView.$("$child")[0].should.equal(this.theView.$(".test-child")[0]);
       });
     });
     describe("the elementsPrefix attribute", function() {
