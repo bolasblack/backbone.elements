@@ -37,11 +37,14 @@ do (jQuery, _, Backbone, console) ->
       _.extend this, _.pick options, ["elements", "elementsPrefix"]
       @_initElements()
 
-      if _.isFunction @dispose
-        dispose = @dispose
-        @dispose = ->
-          dispose.apply this, arguments
-          @clearElements()
+      return unless _.isFunction @dispose
+      dispose = @dispose
+      @_disposed = false
+      @dispose = ->
+        return if @_disposed
+        dispose.apply this, arguments
+        @clearElements()
+        @_disposed = true
 
     delegateEvents: (events) ->
       unless (events or= _.result this, "events")

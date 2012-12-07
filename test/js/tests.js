@@ -7,7 +7,6 @@
     View = Backbone.View;
     beforeEach(function() {
       this.clickChildSpy = sinon.spy();
-      this.disposeSpy = sinon.spy();
       this.theView = new (View.extend({
         el: $("#test"),
         elements: {
@@ -18,10 +17,10 @@
         },
         events: {
           "click $child": this.clickChildSpy
-        }
+        },
+        dispose: function() {}
       }));
-      this.$child = this.theView.$child();
-      return this.theView.dispose = this.disposeSpy;
+      return this.$child = this.theView.$child();
     });
     describe("the elements attribute", function() {
       it("should be work", function() {
@@ -125,7 +124,7 @@
         return this.clickChildSpy.called.should.be["true"];
       });
     });
-    return describe("the clearElements method", function() {
+    describe("the clearElements method", function() {
       it("should be work", function() {
         var property, _i, _len, _ref, _results;
         this.theView.clearElements();
@@ -148,16 +147,35 @@
         }
         return _results;
       });
-      it("should not run if `elements` attribute not exist", function() {
+      return it("should not run if `elements` attribute not exist", function() {
         var view;
         view = new View({
           el: $("#test")
         });
         return view.clearElements.should.not.to["throw"](TypeError);
       });
-      return it("should run when disposed", function() {
+    });
+    return describe("the dispose method", function() {
+      it("should wrap only when dispose exist", function() {
+        var view;
+        view = new View;
+        view.should.not.have.property("dispose");
+        return view.should.not.have.property("_disposed");
+      });
+      it("should run `clearElements` method", function() {
+        var clearElementsSpy;
+        clearElementsSpy = sinon.spy();
+        this.theView.clearElements = clearElementsSpy;
         this.theView.dispose();
-        return this.disposeSpy.called.should.be["true"];
+        return clearElementsSpy.called.should.be["true"];
+      });
+      return it("should only run once", function() {
+        var clearElementsSpy;
+        clearElementsSpy = sinon.spy();
+        this.theView.clearElements = clearElementsSpy;
+        this.theView.dispose();
+        this.theView.dispose();
+        return clearElementsSpy.calledOnce.should.be["true"];
       });
     });
   });

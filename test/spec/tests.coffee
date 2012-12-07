@@ -4,7 +4,6 @@ describe "the backbone elements plugin", ->
 
   beforeEach ->
     @clickChildSpy = sinon.spy()
-    @disposeSpy = sinon.spy()
     @theView = new (View.extend
       el: $ "#test"
       elements:
@@ -14,9 +13,9 @@ describe "the backbone elements plugin", ->
         "$notExistElement li": "it_may_call_stack_overflow"
       events:
         "click $child": @clickChildSpy
+      dispose: ->
     )
     @$child = @theView.$child()
-    @theView.dispose = @disposeSpy
 
   describe "the elements attribute", ->
     it "should be work", ->
@@ -126,6 +125,23 @@ describe "the backbone elements plugin", ->
       view = new View el: $ "#test"
       view.clearElements.should.not.to.throw TypeError
 
-    it "should run when disposed", ->
+  describe "the dispose method", ->
+    it "should wrap only when dispose exist", ->
+      view = new View
+      view.should.not.have.property "dispose"
+      view.should.not.have.property "_disposed"
+
+    it "should run `clearElements` method", ->
+      clearElementsSpy = sinon.spy()
+      @theView.clearElements = clearElementsSpy
+
       @theView.dispose()
-      @disposeSpy.called.should.be.true
+      clearElementsSpy.called.should.be.true
+
+    it "should only run once", ->
+      clearElementsSpy = sinon.spy()
+      @theView.clearElements = clearElementsSpy
+
+      @theView.dispose()
+      @theView.dispose()
+      clearElementsSpy.calledOnce.should.be.true
