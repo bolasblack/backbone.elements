@@ -122,6 +122,10 @@ describe "the backbone elements plugin", ->
       for selector in elementSelectors
         @theView.should.not.have.property @theView.elementsPrefix + selector
 
+    it "should not run if `elements` attribute not exist", ->
+      view = new View el: $ "#test"
+      view.clearElements.should.not.to.throw TypeError
+
     it "should run when disposed", ->
       @theView.dispose()
       @disposeSpy.called.should.be.true

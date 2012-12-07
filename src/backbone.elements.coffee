@@ -60,6 +60,7 @@ do (jQuery, _, Backbone, console) ->
       @delegateEvents()
 
     clearElements: ->
+      return unless @elements
       elementSelectors = _(@_reverseElements).keys()
       for selector in elementSelectors
         delete this[@elementsPrefix + selector]

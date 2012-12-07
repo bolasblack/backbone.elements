@@ -148,6 +148,13 @@
         }
         return _results;
       });
+      it("should not run if `elements` attribute not exist", function() {
+        var view;
+        view = new View({
+          el: $("#test")
+        });
+        return view.clearElements.should.not.to["throw"](TypeError);
+      });
       return it("should run when disposed", function() {
         this.theView.dispose();
         return this.disposeSpy.called.should.be["true"];
