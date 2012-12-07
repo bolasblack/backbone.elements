@@ -137,6 +137,17 @@
         }
         return _results;
       });
+      it("should clear all generated selector method", function() {
+        var elementSelectors, selector, _i, _len, _results;
+        elementSelectors = _(this.theView._reverseElements).keys();
+        this.theView.clearElements();
+        _results = [];
+        for (_i = 0, _len = elementSelectors.length; _i < _len; _i++) {
+          selector = elementSelectors[_i];
+          _results.push(this.theView.should.not.have.property(this.theView.elementsPrefix + selector));
+        }
+        return _results;
+      });
       return it("should run when disposed", function() {
         this.theView.dispose();
         return this.disposeSpy.called.should.be["true"];

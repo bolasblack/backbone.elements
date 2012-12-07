@@ -116,6 +116,12 @@ describe "the backbone elements plugin", ->
       for property in ["_reverseElements", "_elementsCache", "_regPrefix"]
         @theView.should.not.have.property property
 
+    it "should clear all generated selector method", ->
+      elementSelectors = _(@theView._reverseElements).keys()
+      @theView.clearElements()
+      for selector in elementSelectors
+        @theView.should.not.have.property @theView.elementsPrefix + selector
+
     it "should run when disposed", ->
       @theView.dispose()
       @disposeSpy.called.should.be.true
