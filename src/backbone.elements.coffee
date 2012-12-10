@@ -40,7 +40,7 @@ do (jQuery, _, Backbone, console) ->
       return unless _.isFunction @dispose
       dispose = @dispose
       @_disposed = false
-      @dispose = ->
+      @dispose = =>
         return if @_disposed
         dispose.apply this, arguments
         @clearElements()
