@@ -1,6 +1,6 @@
 {
   "name": "backbone.elements",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "add custom select symbol for backbone selector",
   "main": "index.js",
   "scripts": {

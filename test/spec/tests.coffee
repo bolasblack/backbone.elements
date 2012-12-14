@@ -4,7 +4,6 @@ describe "the backbone elements plugin", ->
 
   beforeEach ->
     @clickChildSpy = sinon.spy()
-    @disposeSpy = sinon.spy()
     @theView = new (View.extend
       el: $ "#test"
       elements:
@@ -14,9 +13,9 @@ describe "the backbone elements plugin", ->
         "$notExistElement li": "it_may_call_stack_overflow"
       events:
         "click $child": @clickChildSpy
+      dispose: ->
     )
     @$child = @theView.$child()
-    @theView.dispose = @disposeSpy
 
   describe "the elements attribute", ->
     it "should be work", ->
@@ -45,6 +44,16 @@ describe "the backbone elements plugin", ->
     it "should work in elements selector", ->
       @theView.$childElement()[0].should.equal @theView.$child(".test-child-element")[0]
 
+    it "should work in events selector", ->
+      @$child.trigger "click"
+      @clickChildSpy.called.should.be.true
+
+    it "should work in `this.$` selector", ->
+      @theView.$("$child")[0].should.equal @theView.$(".test-child")[0]
+
+    it "should be parsed in nested case", ->
+      @theView.parseSelectorSymbol("$childElement").should.equal ".test-child .test-child-element"
+
     it "should be parsed in all select case", ->
       specialCases = [
         "#aaa", ".aaa", ",aaa"
@@ -62,13 +71,6 @@ describe "the backbone elements plugin", ->
 
       @theView.parseSelectorSymbol(specialCases.join "$child")
         .should.equal specialCases.join ".test-child"
-
-    it "should work in events selector", ->
-      @$child.trigger "click"
-      @clickChildSpy.called.should.be.true
-
-    it "should work in `this.$` selector", ->
-      @theView.$("$child")[0].should.equal @theView.$(".test-child")[0]
 
   describe "the elementsPrefix attribute", ->
     it "should could be changed", ->
@@ -113,6 +115,33 @@ describe "the backbone elements plugin", ->
       for property in ["_reverseElements", "_elementsCache", "_regPrefix"]
         @theView.should.not.have.property property
 
-    it "should run when disposed", ->
+    it "should clear all generated selector method", ->
+      elementSelectors = _(@theView._reverseElements).keys()
+      @theView.clearElements()
+      for selector in elementSelectors
+        @theView.should.not.have.property @theView.elementsPrefix + selector
+
+    it "should not run if `elements` attribute not exist", ->
+      view = new View el: $ "#test"
+      view.clearElements.should.not.to.throw TypeError
+
+  describe "the dispose method", ->
+    it "should wrap only when dispose exist", ->
+      view = new View
+      view.should.not.have.property "dispose"
+      view.should.not.have.property "_disposed"
+
+    it "should run `clearElements` method", ->
+      clearElementsSpy = sinon.spy()
+      @theView.clearElements = clearElementsSpy
+
       @theView.dispose()
-      @disposeSpy.called.should.be.true
+      clearElementsSpy.called.should.be.true
+
+    it "should only run once", ->
+      clearElementsSpy = sinon.spy()
+      @theView.clearElements = clearElementsSpy
+
+      @theView.dispose()
+      @theView.dispose()
+      clearElementsSpy.calledOnce.should.be.true

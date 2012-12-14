@@ -7,7 +7,6 @@
     View = Backbone.View;
     beforeEach(function() {
       this.clickChildSpy = sinon.spy();
-      this.disposeSpy = sinon.spy();
       this.theView = new (View.extend({
         el: $("#test"),
         elements: {
@@ -18,10 +17,10 @@
         },
         events: {
           "click $child": this.clickChildSpy
-        }
+        },
+        dispose: function() {}
       }));
-      this.$child = this.theView.$child();
-      return this.theView.dispose = this.disposeSpy;
+      return this.$child = this.theView.$child();
     });
     describe("the elements attribute", function() {
       it("should be work", function() {
@@ -58,7 +57,17 @@
       it("should work in elements selector", function() {
         return this.theView.$childElement()[0].should.equal(this.theView.$child(".test-child-element")[0]);
       });
-      it("should be parsed in all select case", function() {
+      it("should work in events selector", function() {
+        this.$child.trigger("click");
+        return this.clickChildSpy.called.should.be["true"];
+      });
+      it("should work in `this.$` selector", function() {
+        return this.theView.$("$child")[0].should.equal(this.theView.$(".test-child")[0]);
+      });
+      it("should be parsed in nested case", function() {
+        return this.theView.parseSelectorSymbol("$childElement").should.equal(".test-child .test-child-element");
+      });
+      return it("should be parsed in all select case", function() {
         var specialCase, specialCases, unableCase, _i, _len;
         specialCases = ["#aaa", ".aaa", ",aaa", " aaa", ">aaa", "+aaa", "~aaa", "[attr='aaa']", ":after"];
         unableCase = specialCases.join("");
@@ -68,13 +77,6 @@
         }
         this.theView.parseSelectorSymbol("$child" + unableCase).should.equal(".test-child" + unableCase);
         return this.theView.parseSelectorSymbol(specialCases.join("$child")).should.equal(specialCases.join(".test-child"));
-      });
-      it("should work in events selector", function() {
-        this.$child.trigger("click");
-        return this.clickChildSpy.called.should.be["true"];
-      });
-      return it("should work in `this.$` selector", function() {
-        return this.theView.$("$child")[0].should.equal(this.theView.$(".test-child")[0]);
       });
     });
     describe("the elementsPrefix attribute", function() {
@@ -122,7 +124,7 @@
         return this.clickChildSpy.called.should.be["true"];
       });
     });
-    return describe("the clearElements method", function() {
+    describe("the clearElements method", function() {
       it("should be work", function() {
         var property, _i, _len, _ref, _results;
         this.theView.clearElements();
@@ -134,9 +136,46 @@
         }
         return _results;
       });
-      return it("should run when disposed", function() {
+      it("should clear all generated selector method", function() {
+        var elementSelectors, selector, _i, _len, _results;
+        elementSelectors = _(this.theView._reverseElements).keys();
+        this.theView.clearElements();
+        _results = [];
+        for (_i = 0, _len = elementSelectors.length; _i < _len; _i++) {
+          selector = elementSelectors[_i];
+          _results.push(this.theView.should.not.have.property(this.theView.elementsPrefix + selector));
+        }
+        return _results;
+      });
+      return it("should not run if `elements` attribute not exist", function() {
+        var view;
+        view = new View({
+          el: $("#test")
+        });
+        return view.clearElements.should.not.to["throw"](TypeError);
+      });
+    });
+    return describe("the dispose method", function() {
+      it("should wrap only when dispose exist", function() {
+        var view;
+        view = new View;
+        view.should.not.have.property("dispose");
+        return view.should.not.have.property("_disposed");
+      });
+      it("should run `clearElements` method", function() {
+        var clearElementsSpy;
+        clearElementsSpy = sinon.spy();
+        this.theView.clearElements = clearElementsSpy;
         this.theView.dispose();
-        return this.disposeSpy.called.should.be["true"];
+        return clearElementsSpy.called.should.be["true"];
+      });
+      return it("should only run once", function() {
+        var clearElementsSpy;
+        clearElementsSpy = sinon.spy();
+        this.theView.clearElements = clearElementsSpy;
+        this.theView.dispose();
+        this.theView.dispose();
+        return clearElementsSpy.calledOnce.should.be["true"];
       });
     });
   });
