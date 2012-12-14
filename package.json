@@ -6,7 +6,7 @@
   "scripts": {
     "test": "make test"
   },
-  "repository": "",
+  "repository": "https://github.com/bolasblack/backbone.elements.git",
   "keywords": [
     "backbone"
   ],
