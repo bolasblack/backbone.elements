@@ -2,8 +2,7 @@
 (function() {
 
   describe("the backbone elements plugin", function() {
-    var View, should;
-    should = chai.should();
+    var View;
     View = Backbone.View;
     beforeEach(function() {
       this.clickChildSpy = sinon.spy();

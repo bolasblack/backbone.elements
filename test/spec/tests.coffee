@@ -1,5 +1,4 @@
 describe "the backbone elements plugin", ->
-  should = chai.should()
   View = Backbone.View
 
   beforeEach ->
