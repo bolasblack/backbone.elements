@@ -18,13 +18,18 @@ do (jQuery, _, Backbone, console) ->
   _.extend Backbone.View.prototype,
     _elementsSymbolSpliter: [
       # normal selector
-      "\\#", "\\."
+      "#", "\\."
       # combo selector
-      "\\,", "\\s", "\\>", "\\+", "\\~"
+      ",", " ", ">", "\\+", "~"
       # attribute selector
       "\\["
       # special selector
       "\\:"
+    ]
+
+    _specialSymbolBreaker: [
+      # the :not($symbol) case
+      "\\)"
     ]
 
     elementsPrefix: "$"
@@ -71,7 +76,7 @@ do (jQuery, _, Backbone, console) ->
         delete this[property]
 
     parseSelectorSymbol: (selector) ->
-      endReStr = @_elementsSymbolSpliter.join "|"
+      endReStr = @_elementsSymbolSpliter.join("|") + "|" + @_specialSymbolBreaker.join "|"
       elementsSelectorRE = ///#{@_regPrefix}([^#{@_negativeReStr()}]*)(?=#{endReStr}|$)///g
       cannotParseSymbols = []
       elementSymbol = null
@@ -121,4 +126,4 @@ do (jQuery, _, Backbone, console) ->
       @_elementsCache = {}
 
     _negativeReStr: ->
-      (@_elementsSymbolSpliter.join "") + @_regPrefix
+      (@_elementsSymbolSpliter.join "") + @_regPrefix + @_specialSymbolBreaker

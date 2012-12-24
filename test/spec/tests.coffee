@@ -65,6 +65,9 @@ describe "the backbone elements plugin", ->
         @theView.parseSelectorSymbol("$child#{specialCase}")
           .should.equal ".test-child#{specialCase}"
 
+      @theView.parseSelectorSymbol(":not($child)")
+        .should.equal ":not(.test-child)"
+
       @theView.parseSelectorSymbol("$child#{unableCase}")
         .should.equal ".test-child#{unableCase}"
 

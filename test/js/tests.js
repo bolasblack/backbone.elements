@@ -74,6 +74,7 @@
           specialCase = specialCases[_i];
           this.theView.parseSelectorSymbol("$child" + specialCase).should.equal(".test-child" + specialCase);
         }
+        this.theView.parseSelectorSymbol(":not($child)").should.equal(":not(.test-child)");
         this.theView.parseSelectorSymbol("$child" + unableCase).should.equal(".test-child" + unableCase);
         return this.theView.parseSelectorSymbol(specialCases.join("$child")).should.equal(specialCases.join(".test-child"));
       });
