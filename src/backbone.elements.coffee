@@ -1,6 +1,6 @@
-do (jQuery, _, Backbone, console) ->
+do (jQuery, _, Backbone) ->
   nop = ->
-  console ?= {log: nop, warn: nop, error: nop}
+  console = window.console or {log: nop, warn: nop, error: nop}
 
   reEscape = (str, skipChar=[]) ->
     reSpecialChar = [
